@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import time
 
 jilin_urls = ["http://wsjkw.jl.gov.cn/xwzx/xwfb/"]
 shanghai_urls = ["http://wsjkw.sh.gov.cn/xwfb/index.html"]
@@ -55,7 +56,8 @@ def jilin_func():
         date = news.select(".news_list_timebar > ul > li:nth-child(2)")[0].string[5:]
         #print("title: %s \ncontent: %s" % (title,content))
         pacakage[num] = {"title":title,"content":content,"date":date}
-    
+    pacakage["len"] = num
+
     return pacakage
 
 def shanghai_func():
@@ -73,6 +75,7 @@ def shanghai_func():
 
     for url in select_urls:
         browser.get(url)
+        time.sleep(3)
         news_list = browser.find_element_by_css_selector("#main > div.main-container.margin-top-15 > div > ul").get_attribute("innerHTML")
         news_list = BeautifulSoup(news_list, 'html.parser')
         news_list = news_list.select("li > a")
@@ -101,6 +104,8 @@ def shanghai_func():
         content = [y.text for y in article.select(".Article_content")]
         date = article.select_one(".Article-time").text
         pacakage[num] = {"title":title,"content":content,"date":date[2:12]}
+    pacakage["len"] = num
+    
     return pacakage
 
 if __name__ == "__main__":
